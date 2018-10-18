@@ -12,4 +12,5 @@
     <Preference
         android:key="about"
         android:title="关于"/>
+
 </PreferenceScreen>
