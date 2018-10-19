@@ -20,12 +20,22 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(getLayout())
         initView()
+        initListener()
+        initData()
     }
 
     abstract fun getLayout(): Int
 
     open fun initView() {
 
+    }
+
+    open fun initListener(){
+
+    }
+
+    open fun initData(){
+        
     }
 
     inline fun <reified T : Activity> startActivityAndFinish() {

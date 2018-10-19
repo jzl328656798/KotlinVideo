@@ -35,7 +35,6 @@ class SettingFragment :PreferenceFragment() {
                 Log.i("Queen","clear_cache")
             }
             "about"->{
-                Log.i("Queen","about")
                 startActivity<MainActivity>()
             }
         }

@@ -9,11 +9,11 @@
         icon="@mipmap/ic_bottom_mv_unselect"
         title="MV" />
     <tab
-        id="@+id/tab_vbang"
+        id="@+id/tab_v_bang"
         icon="@mipmap/ic_bottom_vlist_unselect"
         title="V榜" />
     <tab
-        id="@+id/tab_yuedan"
+        id="@+id/tab_yue_dan"
         icon="@mipmap/ic_bottom_mvlist_unselect"
         title="悦单" />
 </PreferenceScreen>
