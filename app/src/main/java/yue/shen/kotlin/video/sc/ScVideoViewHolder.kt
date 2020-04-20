@@ -5,13 +5,17 @@ import android.view.View
 import com.bumptech.glide.Glide
 import yue.shen.kotlin.video.R
 
-class ScVideoViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
+class ScVideoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    var mController: TxVideoPlayerController? = null
-    var mVideoPlayer: ScVideoPlayer? = null
+    lateinit var mController: TxVideoPlayerController
+    var mVideoPlayer: ScVideoPlayer = itemView.findViewById<ScVideoPlayer>(R.id.sc_video_player)
 
     init {
-        itemView?.findViewById<ScVideoPlayer>(R.id.sc_video_player)
+        // 将列表中的每个视频设置为默认16:9的比例
+        val params = mVideoPlayer.layoutParams
+        params.width = itemView.resources.displayMetrics.widthPixels // 宽度为屏幕宽度
+        params.height = (params.width * 9f / 16f).toInt() // 高度为宽度的9/16
+        mVideoPlayer.layoutParams = params
     }
 
     fun bindData(url: String, imgUrl: String) {
@@ -19,12 +23,12 @@ class ScVideoViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
                 .load(imgUrl)
                 .placeholder(R.mipmap.img_default)
                 .crossFade()
-                .into(mController?.imageView())
-        mVideoPlayer?.setUp(url)
+                .into(mController.imageView())
+        mVideoPlayer.setUp(url)
     }
 
     fun setController(controller: TxVideoPlayerController) {
         mController = controller
-        mController?.let { mVideoPlayer?.setController(it) }
+        mVideoPlayer.setController(mController)
     }
 }

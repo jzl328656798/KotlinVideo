@@ -30,7 +30,7 @@ class ScActivity : BaseActivity() {
 
     private fun getData(): ArrayList<String> {
         val list = ArrayList<String>()
-        list.add("https://cmsqa-oss.sgmlink.com/5d47f514e458d/try/1.m3u8")
+        list.add("http://tanzi27niu.cdsb.mobi/wps/wp-content/uploads/2017/05/2017-05-10_10-20-26.mp4")
         list.add("https://cmsqa-oss.sgmlink.com/5d47f514e458d/try/1.m3u8")
         list.add("https://cmsqa-oss.sgmlink.com/5d47f514e458d/try/1.m3u8")
         list.add("https://cmsqa-oss.sgmlink.com/5d47f514e458d/try/1.m3u8")

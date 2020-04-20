@@ -8,7 +8,7 @@ import yue.shen.kotlin.video.R
 
 class ScVideoAdapter(var context: Context,var list:ArrayList<String> ) : RecyclerView.Adapter<ScVideoViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ScVideoViewHolder {
-        val itemView = LayoutInflater.from(context)?.inflate(R.layout.item_sc_video, parent, false)
+        val itemView = LayoutInflater.from(context).inflate(R.layout.item_sc_video, parent, false)
         val holder = ScVideoViewHolder(itemView)
         val controller = TxVideoPlayerController(context)
         holder.setController(controller)

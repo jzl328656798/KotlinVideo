@@ -95,15 +95,15 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
     }
 
 
-    private var mPlayerType: Int = TYPE_IJK
+    private var mPlayerType: Int = TYPE_NATIVE
     private var mCurrentState: Int = STATE_IDLE
     private var mCurrentMode: Int = MODE_NORMAL
 
     private var mAudioManager: AudioManager? = null
     private var mMediaPlayer: IMediaPlayer? = null
     private lateinit var mContainer: FrameLayout
-    private lateinit var mTextureView: ScTextureView
-    private lateinit var mController: ScVideoPlayerController
+    private var mTextureView: ScTextureView? = null
+    private var mController: ScVideoPlayerController? = null
     private var mSurfaceTexture: SurfaceTexture? = null
     private var mSurface: Surface? = null
     private lateinit var mUrl: String
@@ -131,8 +131,8 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
     fun setController(controller: ScVideoPlayerController) {
         mContainer.removeView(mController)
         mController = controller
-        mController.reset()
-        mController.setNiceVideoPlayer(this)
+        mController?.reset()
+        mController?.setNiceVideoPlayer(this)
         val params = LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT)
@@ -182,12 +182,12 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
         if (mCurrentState == STATE_PAUSED) {
             mMediaPlayer?.start()
             mCurrentState = STATE_PLAYING
-            mController.onPlayStateChanged(mCurrentState)
+            mController?.onPlayStateChanged(mCurrentState)
             log("STATE_PLAYING")
         } else if (mCurrentState == STATE_BUFFERING_PAUSED) {
             mMediaPlayer?.start()
             mCurrentState = STATE_BUFFERING_PLAYING
-            mController.onPlayStateChanged(mCurrentState)
+            mController?.onPlayStateChanged(mCurrentState)
             log("STATE_BUFFERING_PLAYING")
         } else if (mCurrentState == STATE_COMPLETED || mCurrentState == STATE_ERROR) {
             mMediaPlayer?.reset()
@@ -201,13 +201,13 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
         if (mCurrentState == STATE_PLAYING) {
             mMediaPlayer?.pause()
             mCurrentState = STATE_PAUSED
-            mController.onPlayStateChanged(mCurrentState)
+            mController?.onPlayStateChanged(mCurrentState)
             log("STATE_PAUSED")
         }
         if (mCurrentState == STATE_BUFFERING_PLAYING) {
             mMediaPlayer?.pause()
             mCurrentState = STATE_BUFFERING_PAUSED
-            mController.onPlayStateChanged(mCurrentState)
+            mController?.onPlayStateChanged(mCurrentState)
             log("STATE_BUFFERING_PAUSED")
         }
     }
@@ -321,7 +321,7 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
     private fun initTextureView() {
         if (mTextureView == null) {
             mTextureView = ScTextureView(context)
-            mTextureView!!.surfaceTextureListener = this
+            mTextureView?.surfaceTextureListener = this
         }
     }
 
@@ -339,7 +339,7 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
             mSurfaceTexture = surface
             openMediaPlayer()
         } else {
-            mTextureView!!.surfaceTexture = mSurfaceTexture
+            mTextureView?.surfaceTexture = mSurfaceTexture
         }
     }
 
@@ -362,7 +362,7 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
             mMediaPlayer?.setSurface(mSurface)
             mMediaPlayer?.prepareAsync()
             mCurrentState = STATE_PREPARING
-            mController.onPlayStateChanged(mCurrentState)
+            mController?.onPlayStateChanged(mCurrentState)
             log("STATE_PREPARING")
         } catch (e: IOException) {
             e.printStackTrace()
@@ -380,7 +380,7 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
 
     private val mOnPreparedListener = IMediaPlayer.OnPreparedListener { mp ->
         mCurrentState = STATE_PREPARED
-        mController.onPlayStateChanged(mCurrentState)
+        mController?.onPlayStateChanged(mCurrentState)
         log("onPrepared ——> STATE_PREPARED")
         mp.start()
         // 从上次的保存位置播放
@@ -395,13 +395,13 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
     }
 
     private val mOnVideoSizeChangedListener = IMediaPlayer.OnVideoSizeChangedListener { mp, width, height, sar_num, sar_den ->
-        mTextureView.adaptVideoSize(width, height)
+        mTextureView?.adaptVideoSize(width, height)
         log("onVideoSizeChanged ——> width：$width， height：$height")
     }
 
     private val mOnCompletionListener = IMediaPlayer.OnCompletionListener {
         mCurrentState = STATE_COMPLETED
-        mController.onPlayStateChanged(mCurrentState)
+        mController?.onPlayStateChanged(mCurrentState)
         log("onCompletion ——> STATE_COMPLETED")
         // 清除屏幕常亮
         mContainer.keepScreenOn = false
@@ -410,7 +410,7 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
     private val mOnErrorListener = IMediaPlayer.OnErrorListener { mp, what, extra -> // 直播流播放时去调用mediaPlayer.getDuration会导致-38和-2147483648错误，忽略该错误
         if (what != -38 && what != -2147483648 && extra != -38 && extra != -2147483648) {
             mCurrentState = STATE_ERROR
-            mController.onPlayStateChanged(mCurrentState)
+            mController?.onPlayStateChanged(mCurrentState)
             log("onError ——> STATE_ERROR ———— what：$what, extra: $extra")
         }
         true
@@ -420,7 +420,7 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
         if (what == IMediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
             // 播放器开始渲染
             mCurrentState = STATE_PLAYING
-            mController.onPlayStateChanged(mCurrentState)
+            mController?.onPlayStateChanged(mCurrentState)
             log("onInfo ——> MEDIA_INFO_VIDEO_RENDERING_START：STATE_PLAYING")
         } else if (what == IMediaPlayer.MEDIA_INFO_BUFFERING_START) {
             // MediaPlayer暂时不播放，以缓冲更多的数据
@@ -431,22 +431,22 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
                 mCurrentState = STATE_BUFFERING_PLAYING
                 log("onInfo ——> MEDIA_INFO_BUFFERING_START：STATE_BUFFERING_PLAYING")
             }
-            mController.onPlayStateChanged(mCurrentState)
+            mController?.onPlayStateChanged(mCurrentState)
         } else if (what == IMediaPlayer.MEDIA_INFO_BUFFERING_END) {
             // 填充缓冲区后，MediaPlayer恢复播放/暂停
             if (mCurrentState == STATE_BUFFERING_PLAYING) {
                 mCurrentState = STATE_PLAYING
-                mController.onPlayStateChanged(mCurrentState)
+                mController?.onPlayStateChanged(mCurrentState)
                 log("onInfo ——> MEDIA_INFO_BUFFERING_END： STATE_PLAYING")
             }
             if (mCurrentState == STATE_BUFFERING_PAUSED) {
                 mCurrentState = STATE_PAUSED
-                mController.onPlayStateChanged(mCurrentState)
+                mController?.onPlayStateChanged(mCurrentState)
                 log("onInfo ——> MEDIA_INFO_BUFFERING_END： STATE_PAUSED")
             }
         } else if (what == IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED) {
             // 视频旋转了extra度，需要恢复
-            mTextureView.rotation = extra.toFloat()
+            mTextureView?.rotation = extra.toFloat()
             log("视频旋转角度：$extra")
         } else if (what == IMediaPlayer.MEDIA_INFO_NOT_SEEKABLE) {
             log("视频不能seekTo，为直播视频")
@@ -481,7 +481,7 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
         contentView?.addView(mContainer, params)
 
         mCurrentMode = MODE_FULL_SCREEN
-        mController.onPlayModeChanged(mCurrentMode)
+        mController?.onPlayModeChanged(mCurrentMode)
         log("MODE_FULL_SCREEN")
     }
 
@@ -497,7 +497,7 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
                     ViewGroup.LayoutParams.MATCH_PARENT)
             this.addView(mContainer, params)
             mCurrentMode = MODE_NORMAL
-            mController.onPlayModeChanged(mCurrentMode)
+            mController?.onPlayModeChanged(mCurrentMode)
             log("MODE_NORMAL")
             return true
         }
@@ -520,7 +520,7 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
         ScUtil.scanForActivity(context)?.findViewById<ViewGroup>(R.id.content)?.addView(mContainer, params)
 
         mCurrentMode = MODE_TINY_WINDOW
-        mController.onPlayModeChanged(mCurrentMode)
+        mController?.onPlayModeChanged(mCurrentMode)
         log("MODE_TINY_WINDOW")
     }
 
@@ -533,7 +533,7 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
                     ViewGroup.LayoutParams.MATCH_PARENT)
             this.addView(mContainer, params)
             mCurrentMode = MODE_NORMAL
-            mController.onPlayModeChanged(mCurrentMode)
+            mController?.onPlayModeChanged(mCurrentMode)
             log("MODE_NORMAL")
             return true
         }
@@ -589,7 +589,7 @@ class ScVideoPlayer : FrameLayout, IScVideoPlayer, SurfaceTextureListener {
         // 恢复控制器
 
         // 恢复控制器
-        mController.reset()
+        mController?.reset()
         Runtime.getRuntime().gc()
     }
 
